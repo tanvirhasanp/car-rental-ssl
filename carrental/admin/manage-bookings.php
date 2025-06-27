@@ -26,13 +26,14 @@ if(isset($_REQUEST['aeid']))
 $aeid=intval($_GET['aeid']);
 $status=1;
 
-$sql = "UPDATE tblbooking SET Status=:status WHERE  id=:aeid";
+$sql = "UPDATE tblbooking SET Status=:status, payment_status='PAID' WHERE  id=:aeid";
 $query = $dbh->prepare($sql);
 $query -> bindParam(':status',$status, PDO::PARAM_STR);
 $query-> bindParam(':aeid',$aeid, PDO::PARAM_STR);
 $query -> execute();
 
 $msg="Booking Successfully Confirmed";
+// Note: Confirming a booking automatically sets payment_status to 'PAID'
 }
 
 

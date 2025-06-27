@@ -138,13 +138,7 @@ foreach($results as $result)
                 { ?>
                 <div class="vehicle_status"> 
                     <a href="#" class="btn outline btn-xs active-btn">Confirmed</a>
-                    <?php if($result->payment_status == 'PAID'): ?>
-                        <a href="#" class="btn outline btn-xs" style="background:#28a745;color:white;">Paid</a>
-                    <?php elseif($result->payment_status == 'PENDING'): ?>
-                        <a href="payment_fixed.php" class="btn outline btn-xs" style="background:#ffc107;color:#212529;">Pay Now</a>
-                    <?php elseif($result->payment_status == 'FAILED'): ?>
-                        <a href="payment_fixed.php" class="btn outline btn-xs" style="background:#dc3545;color:white;">Payment Failed - Retry</a>
-                    <?php endif; ?>
+                    <a href="#" class="btn outline btn-xs" style="background:#28a745;color:white;">Paid</a>
                     <div class="clearfix"></div>
                 </div>
 
@@ -159,9 +153,7 @@ foreach($results as $result)
                 <?php } else { ?>
                 <div class="vehicle_status"> 
                     <a href="#" class="btn outline btn-xs">Not Confirm yet</a>
-                    <?php if(!$result->payment_status || $result->payment_status == 'PENDING'): ?>
-                        <a href="payment_fixed.php" class="btn outline btn-xs" style="background:#007bff;color:white;">Pay Now</a>
-                    <?php endif; ?>
+                    <a href="payment_fixed.php" class="btn outline btn-xs" style="background:#007bff;color:white;">Pay Now</a>
                     <div class="clearfix"></div>
                 </div>
                 <?php } ?>
