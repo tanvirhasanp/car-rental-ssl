@@ -54,8 +54,9 @@ function sendVerificationEmail($email, $fullName, $verificationToken) {
                     <p>Thank you for registering with ' . SITE_NAME . '. To complete your registration, please verify your email address by clicking the button below:</p>
                     
                     <p style="text-align: center;">
-                        <a href="' . $verificationLink . '" class="button">Verify Email Address</a>
-                    </p>
+    <a href="' . $verificationLink . '" class="button" style="color: white;">Verify Email Address</a>
+</p>
+
                     
                     <p>If the button above doesn\'t work, you can copy and paste the following link into your browser:</p>
                     <p style="word-break: break-all; color: #007bff;">' . $verificationLink . '</p>
