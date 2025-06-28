@@ -87,7 +87,7 @@ if(isset($_POST['login'])) {
         <p>Don't have an account? <a href="#signupform" data-toggle="modal" data-dismiss="modal">Signup Here</a></p>
         <p><a href="#forgotpassword" data-toggle="modal" data-dismiss="modal">Forgot Password ?</a></p>
         <p><a href="resend-verification.php">Resend Verification Email</a></p>
-        <p><a href="test-email-verification.php" target="_blank">Test Email Verification</a></p>
+        <!-- <p><a href="test-email-verification.php" target="_blank">Test Email Verification</a></p> -->
       </div>
     </div>
   </div>
