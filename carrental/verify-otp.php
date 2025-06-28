@@ -17,7 +17,15 @@ if(isset($_POST['verify_otp'])) {
     $tempToken = $_SESSION['temp_login_token'];
     $email = $_SESSION['temp_email'];
     
-    // Get the user data to check OTP details
+    // Debug info (remove in production)
+    error_log("OTP Verification - Email: $email, Entered OTP: '$enteredOtp', OTP Length: " . strlen($enteredOtp));
+    
+    // Check if OTP is provided
+    if(empty($enteredOtp) || strlen($enteredOtp) != 6) {
+        $message = 'Please enter a valid 6-digit OTP code.';
+        $messageType = 'error';
+    } else {
+        // Get the user data to check OTP details
     $checkSql = "SELECT * FROM tblusers WHERE EmailId = :email AND temp_login_token = :token";
     $checkQuery = $dbh->prepare($checkSql);
     $checkQuery->bindParam(':email', $email, PDO::PARAM_STR);
@@ -31,10 +39,13 @@ if(isset($_POST['verify_otp'])) {
             $message = 'This OTP has already been used. Please login again to receive a new code.';
             $messageType = 'error';
         }
-        // Check if OTP matches
-        else if($userData->otp_code !== $enteredOtp) {
+        // Check if OTP matches (using loose comparison to handle string/int differences)
+        else if($userData->otp_code != $enteredOtp) {
             $message = 'Invalid OTP. Please check your email and try again.';
             $messageType = 'error';
+            
+            // Debug info (remove in production)
+            error_log("OTP Debug - Expected: " . $userData->otp_code . " (type: " . gettype($userData->otp_code) . "), Received: " . $enteredOtp . " (type: " . gettype($enteredOtp) . ")");
         }
         // All checks passed - OTP is valid
         else {
@@ -63,6 +74,7 @@ if(isset($_POST['verify_otp'])) {
     } else {
         $message = 'Invalid session. Please login again.';
         $messageType = 'error';
+    }
     }
 }
 
@@ -343,13 +355,16 @@ $(document).ready(function() {
         // Update hidden field with complete OTP
         updateOtpCode();
         
-        // Auto-submit if all 6 digits are entered
-        if(getAllOtpDigits().length === 6) {
-            $('#verifyBtn').removeClass('btn-success').addClass('btn-warning').html('<i class="fa fa-spinner fa-spin"></i> Verifying...');
-            setTimeout(function() {
-                $('#otpForm').submit();
-            }, 500);
-        }
+        // Don't auto-submit for manual typing - let user click verify button
+    });
+    
+    // Handle focus and blur events for better UX
+    $('.otp-digit').on('focus', function() {
+        $(this).select(); // Select all text when focused
+    });
+    
+    $('.otp-digit').on('blur', function() {
+        updateOtpCode(); // Ensure OTP is updated when leaving field
     });
     
     // Handle backspace
@@ -380,8 +395,52 @@ $(document).ready(function() {
         updateOtpCode();
         
         if(digits.length === 6) {
-            $('#verifyBtn').focus();
+            // Auto-submit when pasted
+            $('#verifyBtn').removeClass('btn-success').addClass('btn-warning').html('<i class="fa fa-spinner fa-spin"></i> Verifying...');
+            $('#otpForm').submit();
         }
+    });
+    
+    // Handle manual verify button click
+    $('#verifyBtn').on('click', function(e) {
+        var otpValue = getAllOtpDigits();
+        if(otpValue.length !== 6) {
+            e.preventDefault();
+            alert('Please enter all 6 digits of the verification code.');
+            $('.otp-digit').addClass('error');
+            setTimeout(function() {
+                $('.otp-digit').removeClass('error');
+            }, 1000);
+            return false;
+        }
+        
+        // Ensure the hidden field is updated
+        $('#otp_code').val(otpValue);
+        
+        // Change button state
+        $(this).removeClass('btn-success').addClass('btn-warning').html('<i class="fa fa-spinner fa-spin"></i> Verifying...');
+        
+        // Let the form submit naturally
+        return true;
+    });
+    
+    // Handle form submission to ensure OTP is always updated
+    $('#otpForm').on('submit', function(e) {
+        var otpValue = getAllOtpDigits();
+        $('#otp_code').val(otpValue);
+        console.log('Form submitting with OTP:', otpValue); // Debug log
+        
+        if(otpValue.length !== 6) {
+            e.preventDefault();
+            alert('Please enter all 6 digits of the verification code.');
+            $('.otp-digit').addClass('error');
+            setTimeout(function() {
+                $('.otp-digit').removeClass('error');
+            }, 1000);
+            return false;
+        }
+        
+        return true;
     });
     
     function getAllOtpDigits() {
@@ -393,7 +452,9 @@ $(document).ready(function() {
     }
     
     function updateOtpCode() {
-        $('#otp_code').val(getAllOtpDigits());
+        var otp = getAllOtpDigits();
+        $('#otp_code').val(otp);
+        console.log('OTP updated:', otp); // Debug log
     }
     
     // Show error animation if there's an error message
