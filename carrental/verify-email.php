@@ -136,7 +136,7 @@ if(isset($_GET['token']) && !empty($_GET['token'])) {
                     <div class="alert alert-success">
                         <?php echo $message; ?>
                     </div>
-                    <a href="index.php" class="btn btn-primary">Go to Login</a>
+                    <a href="#loginform" class="btn btn-primary" data-toggle="modal">Go to Login</a>
                     
                 <?php elseif($messageType == 'info'): ?>
                     <div class="verification-icon info-icon">
@@ -145,7 +145,7 @@ if(isset($_GET['token']) && !empty($_GET['token'])) {
                     <div class="alert alert-info">
                         <?php echo $message; ?>
                     </div>
-                    <a href="index.php" class="btn btn-primary">Go to Login</a>
+                    <a href="#loginform" class="btn btn-primary" data-toggle="modal">Go to Login</a>
                     
                 <?php else: ?>
                     <div class="verification-icon error-icon">
@@ -180,5 +180,39 @@ if(isset($_GET['token']) && !empty($_GET['token'])) {
 <!-- Scripts -->
 <script src="assets/js/jquery.min.js"></script>
 <script src="assets/js/bootstrap.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Improve the login modal experience
+    $('a[href="#loginform"]').on('click', function(e) {
+        e.preventDefault();
+        // Close any existing modals first
+        $('.modal').modal('hide');
+        
+        // Wait a moment then show the login modal
+        setTimeout(function() {
+            $('#loginform').modal({
+                backdrop: 'static', // Prevent closing when clicking outside
+                keyboard: true,     // Allow closing with escape key
+                show: true
+            });
+        }, 200);
+    });
+    
+    // Focus on email field when login modal opens
+    $('#loginform').on('shown.bs.modal', function () {
+        $(this).find('input[name="email"]').focus();
+    });
+    
+    // Prevent the modal from closing accidentally
+    $('#loginform').on('hide.bs.modal', function (e) {
+        // Only allow closing if the user clicked the close button or pressed escape
+        if (!$(e.target).hasClass('close') && e.originalEvent && e.originalEvent.type !== 'keydown') {
+            return false;
+        }
+    });
+});
+</script>
+
 </body>
 </html>

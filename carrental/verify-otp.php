@@ -227,6 +227,20 @@ if(isset($_POST['resend_otp'])) {
     color:rgb(205, 211, 216) !important;
     text-decoration: underline;
 }
+
+/* Modal improvements */
+.modal-backdrop {
+    z-index: 1040 !important;
+}
+.modal {
+    z-index: 1050 !important;
+}
+#loginform {
+    display: none;
+}
+#loginform.in {
+    display: block !important;
+}
 </style>
 </head>
 <body>
@@ -298,8 +312,8 @@ if(isset($_POST['resend_otp'])) {
                     </form>
                     
                     <div style="margin-top: 20px;">
-                        <a href="index.php" class="btn btn-secondary">
-                            <i class="fa fa-arrow-left"></i> Cancel Login
+                        <a href="#loginform" class="btn btn-secondary" data-toggle="modal">
+                            <i class="fa fa-arrow-left"></i> Back to Login
                         </a>
                     </div>
                     
@@ -318,6 +332,19 @@ if(isset($_POST['resend_otp'])) {
 <!--Footer -->
 <?php include('includes/footer.php');?>
 <!-- /Footer-->
+
+<!--Login-Form -->
+<?php include('includes/login.php');?>
+<!--/Login-Form --> 
+
+<!--Register-Form -->
+<?php include('includes/registration.php');?>
+
+<!--/Register-Form --> 
+
+<!--Forgot-password-Form -->
+<?php include('includes/forgotpassword.php');?>
+<!--/Forgot-password-Form --> 
 
 <!--Back to top-->
 <div id="back-top" class="back-top"> <a href="#top"><i class="fa fa-angle-up" aria-hidden="true"></i> </a> </div>
@@ -464,6 +491,35 @@ $(document).ready(function() {
         $('.otp-digit').removeClass('error');
     }, 1000);
     <?php endif; ?>
+    
+    // Handle login modal buttons
+    $('a[href="#loginform"]').on('click', function(e) {
+        e.preventDefault();
+        // Close any existing modals first
+        $('.modal').modal('hide');
+        
+        // Wait a moment then show the login modal
+        setTimeout(function() {
+            $('#loginform').modal({
+                backdrop: 'static', // Prevent closing when clicking outside
+                keyboard: true,     // Allow closing with escape key
+                show: true
+            });
+        }, 200);
+    });
+    
+    // Focus on email field when login modal opens
+    $('#loginform').on('shown.bs.modal', function () {
+        $(this).find('input[name="email"]').focus();
+    });
+    
+    // Prevent the modal from closing accidentally
+    $('#loginform').on('hide.bs.modal', function (e) {
+        // Only allow closing if the user clicked the close button or pressed escape
+        if (!$(e.target).hasClass('close') && e.originalEvent && e.originalEvent.type !== 'keydown') {
+            return false;
+        }
+    });
 });
 </script>
 
