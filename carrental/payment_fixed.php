@@ -77,23 +77,6 @@ if(isset($_POST['pay_now'])) {
         $post_data['ship_country'] = "Bangladesh";
         $post_data['shipping_method'] = 'NO';
         $post_data['num_of_item'] = 1;
-
-        // Attach selected payment method and extra info
-        $selected_method = isset($_POST['selected_method']) ? $_POST['selected_method'] : 'card';
-        $post_data['selected_method'] = $selected_method;
-        if ($selected_method === 'card') {
-            $post_data['card_number'] = isset($_POST['card_number']) ? $_POST['card_number'] : '';
-            $post_data['cardholder_name'] = isset($_POST['cardholder_name']) ? $_POST['cardholder_name'] : '';
-            $post_data['expiry'] = isset($_POST['expiry']) ? $_POST['expiry'] : '';
-            $post_data['cvv'] = isset($_POST['cvv']) ? $_POST['cvv'] : '';
-        } elseif ($selected_method === 'bkash') {
-            $post_data['bkash_number'] = isset($_POST['bkash_number']) ? $_POST['bkash_number'] : '';
-        } elseif ($selected_method === 'nagad') {
-            $post_data['nagad_number'] = isset($_POST['nagad_number']) ? $_POST['nagad_number'] : '';
-        } elseif ($selected_method === 'rocket') {
-            $post_data['rocket_number'] = isset($_POST['rocket_number']) ? $_POST['rocket_number'] : '';
-        }
-        // You may want to log or store these details for audit, but do not send sensitive card data to SSLCommerz in production!
         
         // Initialize SSL Commerz
         $sslcommerz = new SSLCommerz(STORE_ID, STORE_PASSWORD);
@@ -154,26 +137,6 @@ if(isset($_POST['pay_now'])) {
     text-align: center;
     margin: 20px 0;
 }
-.payment-method {
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    padding: 20px;
-    margin: 15px 0;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-.payment-method:hover {
-    border-color: #007bff;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.2);
-}
-.payment-method.selected {
-    border-color: #007bff;
-    background: #f0f8ff;
-}
-.ssl-logo {
-    max-height: 60px;
-    margin: 10px 0;
-}
 .security-info {
     background: #d4edda;
     border: 1px solid #c3e6cb;
@@ -181,23 +144,30 @@ if(isset($_POST['pay_now'])) {
     padding: 15px;
     margin: 20px 0;
 }
-/* Make payment-method-card clickable and highlight on hover/selected */
-.payment-method-card {
-    cursor: pointer;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    transition: border-color 0.3s, box-shadow 0.3s, background 0.3s;
+.ssl-logo {
+    max-height: 60px;
+    margin: 10px 0;
 }
-.payment-method-card:hover {
-    border-color: #007bff;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.15);
-    background: #f8fbff;
+.pay-button {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    border: none;
+    border-radius: 50px;
+    padding: 20px 60px;
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
 }
-.payment-method-card.selected {
-    border-color: #007bff;
-    background: #f0f8ff;
-    box-shadow: 0 2px 8px rgba(0,123,255,0.18);
+.pay-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+    color: white;
+    text-decoration: none;
+}
+.pay-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.3);
 }
 </style>
 </head>
@@ -254,92 +224,31 @@ if(isset($_POST['pay_now'])) {
                 </div>
 
                 <!-- Payment Form -->
-                <div class="payment-card">
+                <!-- <div class="payment-card">
                     <h3 class="text-center">
                         <i class="fa fa-credit-card"></i> Secure Payment
                     </h3>
                     <?php if(isset($error)): ?>
                         <div class="alert alert-danger">
                             <i class="fa fa-exclamation-triangle"></i> <?php echo $error; ?>
-                        </div>
+                        </div> -->
                     <?php endif; ?>
 
-                    <!-- Payment Method Selection -->
-                    <div class="row payment-methods-list text-center" style="margin-bottom: 30px;">
-                        <div class="col-md-3 col-xs-6">
-                            <div class="card payment-method-card" data-method="card">
-                                <div class="card-body">
-                                    <img src="https://www.sslcommerz.com/wp-content/uploads/2019/11/payment_gateways_new-01.png" style="max-width: 100%; height: auto;" alt="Visa/Mastercard">
-                                    <div>Visa/Mastercard</div>
-                                </div>
-                            </div>
+                    <!-- SSL Commerz Logo and Security Info -->
+                    <!-- <div class="text-center" style="margin: 30px 0;">
+                        <img src="https://www.sslcommerz.com/wp-content/uploads/2019/11/payment_gateways_new-01.png" 
+                             alt="SSL Commerz" class="ssl-logo">
+                        <div class="security-info">
+                            <i class="fa fa-shield"></i>
+                            <strong>Secure Payment Gateway</strong><br>
+                            Your payment information is protected with bank-level security
                         </div>
-                        <div class="col-md-3 col-xs-6">
-                            <div class="card payment-method-card" data-method="bkash">
-                                <div class="card-body">
-                                    <img src="https://seeklogo.com/images/B/bkash-logo-835789094D-seeklogo.com.png" style="max-width: 100%; height: auto; max-height: 40px;" alt="bKash">
-                                    <div>bKash</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-xs-6">
-                            <div class="card payment-method-card" data-method="nagad">
-                                <div class="card-body">
-                                    <img src="https://download.logo.wine/logo/Nagad/Nagad-Logo.wine.png" style="max-width: 100%; height: auto; max-height: 40px;" alt="Nagad">
-                                    <div>Nagad</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-xs-6">
-                            <div class="card payment-method-card" data-method="rocket">
-                                <div class="card-body">
-                                    <img src="https://seeklogo.com/images/R/rocket-logo-6B41BBACAB-seeklogo.com.png" style="max-width: 100%; height: auto; max-height: 40px;" alt="Rocket">
-                                    <div>Rocket</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    </div> -->
 
-                    <!-- Payment Method Forms -->
+                    <!-- Simple Payment Form -->
                     <form method="post" id="payment-form">
-                        <input type="hidden" name="selected_method" id="selected_method" value="">
-                        <!-- Card Payment Form -->
-                        <div id="card-section" class="method-section" style="display:none;">
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="card_number" placeholder="Card Number (16 digits)" maxlength="16" pattern="[0-9]{16}" required>
-                            </div>
-                            <div class="form-group">
-                                <input type="text" class="form-control" name="cardholder_name" placeholder="Cardholder Name" required>
-                            </div>
-                            <div class="form-group row">
-                                <div class="col-xs-6">
-                                    <input type="text" class="form-control" name="expiry" placeholder="MM/YY" maxlength="5" pattern="(0[1-9]|1[0-2])\/([0-9]{2})" required>
-                                </div>
-                                <div class="col-xs-6">
-                                    <input type="text" class="form-control" name="cvv" placeholder="CVV" maxlength="4" pattern="[0-9]{3,4}" required>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- bKash Payment Form -->
-                        <div id="bkash-section" class="method-section" style="display:none;">
-                            <div class="form-group">
-                                <input type="tel" class="form-control" name="bkash_number" id="bkash-number" placeholder="bKash Number (01XXXXXXXXX)" maxlength="11" pattern="01[0-9]{9}">
-                            </div>
-                        </div>
-                        <!-- Nagad Payment Form -->
-                        <div id="nagad-section" class="method-section" style="display:none;">
-                            <div class="form-group">
-                                <input type="tel" class="form-control" name="nagad_number" id="nagad-number" placeholder="Nagad Number (01XXXXXXXXX)" maxlength="11" pattern="01[0-9]{9}">
-                            </div>
-                        </div>
-                        <!-- Rocket Payment Form -->
-                        <div id="rocket-section" class="method-section" style="display:none;">
-                            <div class="form-group">
-                                <input type="tel" class="form-control" name="rocket_number" id="rocket-number" placeholder="Rocket Number (01XXXXXXXXX)" maxlength="11" pattern="01[0-9]{9}">
-                            </div>
-                        </div>
                         <div class="text-center">
-                            <button type="submit" name="pay_now" class="btn btn-success btn-lg" style="padding: 15px 50px; font-size: 18px;">
+                            <button type="submit" name="pay_now" class="btn pay-button">
                                 <i class="fa fa-lock"></i> Pay <?php echo CURRENCY_SYMBOL . number_format($totalAmount, 2); ?> Securely
                             </button>
                         </div>
@@ -349,6 +258,7 @@ if(isset($_POST['pay_now'])) {
                             </a>
                         </div>
                     </form>
+                    
                     <!-- Additional Information -->
                     <div style="margin-top: 30px; text-align: center; color: #666;">
                         <small>
@@ -377,36 +287,6 @@ if(isset($_POST['pay_now'])) {
 
 <script>
 $(document).ready(function() {
-    // Hide all method sections and remove selection on load
-    $('.method-section').hide();
-    $('.payment-method-card').removeClass('selected');
-    $('#selected_method').val('');
-    // Payment method selection logic
-    $('.payment-method-card').on('click', function() {
-        var method = $(this).data('method');
-        $('.payment-method-card').removeClass('selected');
-        $(this).addClass('selected');
-        $('.method-section').hide();
-        $('#' + method + '-section').show();
-        $('#selected_method').val(method);
-        // Set required fields dynamically
-        $('input[name="card_number"], input[name="cardholder_name"], input[name="expiry"], input[name="cvv"]').prop('required', method === 'card');
-        $('input[name="bkash_number"]').prop('required', method === 'bkash');
-        $('input[name="nagad_number"]').prop('required', method === 'nagad');
-        $('input[name="rocket_number"]').prop('required', method === 'rocket');
-    });
-    // Mobile number input: auto-format and validate
-    function setupMobileNumberInput(selector) {
-        $(selector).on('input', function() {
-            let val = $(this).val();
-            val = val.replace(/[^0-9]/g, '');
-            if(val.length > 11) val = val.slice(0, 11);
-            $(this).val(val);
-        });
-    }
-    setupMobileNumberInput('#bkash-number');
-    setupMobileNumberInput('#nagad-number');
-    setupMobileNumberInput('#rocket-number');
     // Animate amount on page load
     $('.amount-highlight').hide().fadeIn(1000);
 });
